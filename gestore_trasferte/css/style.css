@@ -1,0 +1,78 @@
+input[readonly] {
+    background-color: #f2f2f2; /* Colore di sfondo grigio */
+    color: #888; /* Colore del testo grigio */
+}
+
+/* style.css */
+.missioni-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.form-missioni {
+    flex: 1;
+    margin-right: 20px; /* Spazio tra il modulo e il riepilogo */
+}
+
+.riepilogo-missioni {
+    flex: 1;
+    align-self: flex-start; /* Allinea il riepilogo in alto */
+}
+
+.intestazione-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.form-intestazione {
+    flex: 1;
+    margin-right: 20px; /* Spazio tra il modulo e il riepilogo */
+}
+
+.riepilogo-intestazione {
+    flex: 1;
+    align-self: flex-start; /* Allinea il riepilogo in alto */
+}
+
+/* Stile per la barra di navigazione */
+.navbar {
+    background-color: #f5f5f5; /* Colore di sfondo chiaro */
+    color: #333; /* Colore del testo scuro */
+    height: 40px; /* Altezza della barra */
+    opacity: 0; /* Inizialmente nascosta */
+    transition: opacity 0.3s ease-in-out;
+    padding: 10px; /* Spaziatura interna per il testo */
+    position: fixed; /* Barra di navigazione fissata in alto */
+    top: 0; /* Distanza dal bordo superiore */
+    left: 0; /* Allineata a sinistra */
+    right: 0; /* Allineata a destra */
+    text-align: center; /* Allineamento del testo al centro */
+    font-size: 16px; /* Dimensione del testo */
+    font-weight: bold; /* Grassetto */
+    z-index: 1000; /* Posizionamento sopra gli altri elementi */
+    border-bottom: 1px solid #ddd; /* Sottolineatura leggera */
+}
+
+/* Stile per il testo quando si passa sopra con il mouse */
+.navbar:hover {
+    background-color: #ddd; /* Cambia il colore di sfondo leggermente più scuro */
+    cursor: pointer; /* Cambia il cursore del mouse */
+}
+
+/* Stile dei bottoni */
+.button {
+    background-color: #007bff; /* Colore di sfondo blu */
+    color: #fff; /* Colore del testo bianco */
+    border: none; /* Nessun bordo */
+    padding: 10px 20px; /* Spaziatura interna per il testo */
+    font-size: 16px; /* Dimensione del testo */
+    cursor: pointer; /* Cambia il cursore del mouse */
+    transition: background-color 0.3s ease-in-out; /* Effetto di transizione */
+}
+
+/* Stile dei bottoni al passaggio del mouse */
+.button:hover {
+    background-color: #0056b3; /* Cambia il colore di sfondo al passaggio del mouse */
+}
+

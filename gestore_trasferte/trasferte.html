@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcolo Trasferte</title>
+    <!-- Aggiunto un link al CSS di DataTables -->
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+	<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
+	<script src="js/script.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+	<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
+	<script>
+      $(document).ready( function () {
+          $('#trasferteTable').DataTable();
+		  // Nascondi la riga "No data available in table"
+		$('#trasferteTable tbody tr:first').hide();
+      });
+  </script>	
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
+	<link rel="stylesheet" href="css/style.css">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/css/select2.min.css" rel="stylesheet" />
+
+</head>
+<body>
+	<div class="navbar">
+        <button  class="button" id="salvaCsv">Salva su csv</button>
+		<button type="button" class="button" id="caricaSalvataggio">Carica un precedente salvataggio</button>
+		<input type="file" id="fileInput" accept=".csv" style="display: none;">
+    </div>
+
+    
+    <h1>Calcolo Trasferte</h1>
+  
+  <section id="intestazione" class="intestazione-container">
+    
+    <form id="intestazioneForm" class="form-intestazione">
+	<h2>Intestazione</h2>
+        <div class="riga-intestazione">
+            <label for="nome">Nome:</label>
+			<input type="text" id="nome" name="nome" value="Fabbretti Carlo Alberto" oninput="updateCalculatedFields()">          
+        </div>
+        <div>
+            <label for="periodo">Periodo di riferimento (Mese/Anno):</label>
+            <input type="month" id="periodo"  oninput="updateCalculatedFields()">
+        </div>
+		<h3>Valori Forfettari</h3>
+        <div class="riga-intestazione">
+            <label for="periodo">Rimborso forfettario nazionale:</label>
+            <input type="text" id="forfettarioNazionale" name="forfettarioNazionale" value="45€"  oninput="updateCalculatedFields()">
+        </div>
+        <div class="riga-intestazione">
+            <label for="periodo">Rimborso forfettario estero:</label>
+            <input type="text" id="forfettarioEstero" name="forfettarioEstero" value="75€"  oninput="updateCalculatedFields()">
+        </div>
+        <div class="riga-intestazione">
+            <label for="veicolo">Veicolo:</label>
+            <input type="text" id="veicolo" name="veicolo" value="BMW X1 25e">
+            <label for="tariffa">Tariffa ACI rimborso chilometrico:</label>
+            <input type="text" id="tariffa" name="tariffa" value="0,58€"  oninput="updateCalculatedFields()">
+        </div>        
+    </form>
+	<div class="riepilogo-intestazione">
+			<h3 >Sintesi</h3>
+            <label for="rimborsoTotale">Rimborso Totale:</label>			
+            <input type="text" id="rimborsoTotale" name="rimborsoTotale" readonly>
+			<!-- Bottone per esportare in CSV -->
+			<button type="button" id="esportaCSV">Esporta in CSV</button>
+	</div>
+   
+	
+</section>
+
+    <br><Br>
+    <!-- Tabella per le trasferte -->
+
+<div class="missioni-container">
+    <form id="formMissioni" class="form-missioni">
+	<h2>Missioni</h2>
+        <div class="input-container">
+            <label for="dataInizio" oninput="updateDataInizioLabel()">Data Inizio</label>
+            <input id="dataInizio" type="date" placeholder="dd/mm/aaaa">
+            <label id="giornoInizio"></label>
+        </div>
+
+        <div class="input-container">
+            <label for="dataFine">Data Fine</label>
+            <input id="dataFine" type="date" oninput="updateDataFineLabel()">
+            <label id="giornoFine" ></label>
+        </div>
+
+        <div class="input-container">
+            <label for="descrizioneMissione">Descrizione</label>
+            <select id="descrizioneMissione" class="editable-dropdown"></select>
+        </div>
+
+        <div class="input-container">
+            <label for="estera">Trasferta Estera</label>
+            <input name="estera" id="trasfertaEstera" type="checkbox" oninput="updateCheckBoxMissioneEstera()">
+        </div>
+
+        <!-- Bottone per aggiungere una nuova trasferta -->
+        <button type="submit" id="aggiungiTrasferta">Aggiungi Trasferta</button>
+    </form>
+
+    <div class="riepilogo-missioni">
+        <h3>totali provvisori</h3>
+        <div>
+            <label for="numeroGiorniMissioneTemp">Numero Giorni Missione</label>
+            <input name="numeroGiorniMissioneTemp" id="numeroGiorniMissioneTemp" type="text" readonly>
+        </div>
+
+        <div>
+            <label for="costoMissioneTemp">Rimborso Forfettario Missione</label>
+            <input name="costoMissioneTemp" id="costoMissioneTemp" type="text" readonly>
+        </div>
+    </div>
+	
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Data Inizio</th>
+                <th>Giorno Inizio</th>
+                <th>Data Fine</th>
+                <th>Giorno Fine</th>
+                <th>Descrizione</th>
+                <th>Numero Giorni</th>
+                <th>Costo Trasferta (€)</th>
+                <th>Trasferta Estera</th>
+            </tr>
+        </thead>
+        <tbody id="trasferteTableBody">
+            <!-- Le righe delle trasferte verranno aggiunte dinamicamente qui -->
+        </tbody>
+        <tfoot>
+            
+            <tr>
+                <td colspan="6"><strong>Totale Giorni Estera</strong></td>
+                <td id="totaleGiorniEstera">0.0</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td colspan="6"><strong>Totale Giorni Nazionale</strong></td>
+                <td id="totaleGiorniNazionale">0.0</td>
+                <td></td>
+            </tr>
+			<tr>
+                <td colspan="6"><strong>Totale</strong></td>
+                <td id="totaleGiorniTrasferta">0</td>
+                <td ><span id="totaleCostoTrasferte">0.00</span></td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+	
+</div>
+
+<div class="rimborsichilometrici-container">
+    <form id="formRimborsiChilometrici" class="form-missioni">
+	<h2>Rimborsi Chilometrici</h2>
+	
+		<div class="input-container">
+            <label for="idMissioneRK">Missione</label>
+            <select id="idMissioneRK" class="editable-dropdown"></select>
+			<label id="missioneDescRK"></label>			
+        </div>
+		
+		<div class="input-container">
+            <label for="dataMissioneRK">Giorno</label>
+            <select id="dataMissioneRK" class="editable-dropdown"></select>
+			<label id="giornoMissioneRK"></label>			
+        </div>
+
+        <div class="input-container">
+            <label for="partenza" oninput="updateIndirizzoPartenzaLabel()">Indirizzo di Partenza</label>
+            <select  id="partenza" class="editable-dropdown"></select>
+            <label id="indirizzoPartenza"></label>
+			<label id="capPartenza"></label>
+			<label id="cittaPartenza"></label>
+        </div>
+
+        <div class="input-container">
+            <label for="arrivo" oninput="updateIndirizzoArrivoLabel()">Indirizzo di Arrivo</label>
+            <select id="arrivo" class="editable-dropdown"></select>
+            <label id="indirizzoArrivo"></label>
+			<label id="capArrivo"></label>
+			<label id="cittaArrivo"></label>
+        </div>
+
+        <div class="input-container">
+            <label for="noteRK">Note</label>
+            <select id="noteRK" class="editable-dropdown"></select>
+        </div>        
+
+        <!-- Bottone per aggiungere una nuova trasferta -->
+        <button type="submit" id="aggiungiRK">Aggiungi Rimborso Chilometrico</button>
+    </form>
+
+    <div class="riepilogo-RK">
+        <h3>totali provvisori</h3>
+        <div>
+            <label for="tempKM">Km percorsi</label>
+            <input name="tempKM" id="tempKM" type="text" readonly>
+        </div>
+
+        <div>
+            <label for="rimborsoKMtmp">Rimborso chilometrico trasferta</label>
+            <input name="rimborsoKMtmp" id="rimborsoKMtmp" type="text" readonly>
+        </div>
+    </div>
+	
+</div>
+
+	<br><br><br>
+    <table id="RKTable">
+        <thead>
+            <tr>
+                <th>ID Missione</th>
+                <th>Data</th>
+                <th>Giorno</th>
+                <th>Indirizzo di Partenza</th>
+                <th>Indirizzo di Arrivo</th>
+                <th>Km</th>
+                <th>Note</th>
+                <th>Rimborso Chilometrico (€)</th>                
+            </tr>
+        </thead>
+        <tbody id="RKTableBody">
+            <!-- Le righe delle trasferte verranno aggiunte dinamicamente qui -->
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="6"><strong>Totale</strong></td>
+                <td id="totaleKM">0</td>
+                <td ><span id="totaleRimborsiKM">0.00</span></td>
+                <td></td>
+            </tr>	           
+        </tfoot>
+    </table>
+</body>
+</html>
