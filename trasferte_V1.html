@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcolo Trasferte</title>
+</head>
+<body>
+	<script src="js/script.js"></script>
+    <h1>Calcolo Trasferte</h1>
+	
+  <section id="intestazione">
+    <h2>Intestazione</h2>
+    <form id="intestazioneForm">
+        <div class="riga-intestazione">
+            <label for="nome">Nome:</label>
+            <input type="text" id="nome" name="nome" value="Fabbretti Carlo Alberto">
+        </div>
+        <div>
+            <label for="periodo">Periodo (Mese/Anno):</label>
+            <input type="month" id="periodo">
+        </div>
+        <div class="riga-intestazione">
+            <label for="periodo">Rimborso forfettario nazionale:</label>
+            <input type="text" id="forfettarioNazionale" name="forfettarioNazionale" value="45€">
+        </div>
+        <div class="riga-intestazione">
+            <label for="periodo">Rimborso forfettario estero:</label>
+            <input type="text" id="forfettarioEstero" name="forfettarioEstero" value="75€">
+        </div>
+        <div class="riga-intestazione">
+            <label for="veicolo">Veicolo:</label>
+            <input type="text" id="veicolo" name="veicolo" value="BMW X1 25e">
+            <label for="tariffa">Tariffa ACI rimborso chilometrico:</label>
+            <input type="text" id="tariffa" name="tariffa" value="0,58€">
+        </div>
+        <div class="riga-intestazione">
+            <label for="rimborsoTotale">Rimborso Totale:</label>
+            <input type="text" id="rimborsoTotale" name="rimborsoTotale" value="2.622,06 €">
+        </div>
+
+        <!-- Bottone per esportare in CSV -->
+        <button type="button" id="esportaCSV">Esporta in CSV</button>
+    </form>
+<!-- Campi per il forfettario -->
+    <h2>Valori Forfettari</h2>
+    <div>
+        <label for="forfettarioNazionale">Forfettario Nazionale (€/giorno):</label>
+        <input type="number" id="forfettarioNazionale" step="0.01" value="50.00">
+    </div>
+    <div>
+        <label for="forfettarioEstero">Forfettario Estero (€/giorno):</label>
+        <input type="number" id="forfettarioEstero" step="0.01" value="100.00">
+    </div>	
+	
+</section>
+
+    
+    <!-- Tabella per le trasferte -->
+    <h2>Missioni</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Data Inizio</th>
+                <th>Giorno Inizio</th>
+                <th>Data Fine</th>
+                <th>Giorno Fine</th>
+                <th>Descrizione</th>
+                <th>Numero Giorni</th>
+                <th>Costo Trasferta (€)</th>
+                <th>Trasferta Estera</th>
+            </tr>
+        </thead>
+        <tbody id="trasferteTableBody">
+            <!-- Le righe delle trasferte verranno aggiunte dinamicamente qui -->
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="6"><strong>Totale</strong></td>
+                <td id="totaleGiorniTrasferta">0</td>
+                <td ><span id="totaleCostoTrasferte">0.00</span></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td colspan="7"><strong>Totale Giorni Estera</strong></td>
+                <td id="totaleGiorniEstera">0.0</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td colspan="7"><strong>Totale Giorni Nazionale</strong></td>
+                <td id="totaleGiorniNazionale">0.0</td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+ <!-- Bottone per aggiungere una nuova trasferta -->
+    <button id="aggiungiTrasferta">Aggiungi Trasferta</button>
+	
+    
+
+   
+
+</body>
+</html>
