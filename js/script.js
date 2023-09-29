@@ -520,7 +520,11 @@ document.addEventListener("DOMContentLoaded", function () {
 		}
 	}
 
-	
+	// Event listeners
+	document.getElementById("idMissioneRK").addEventListener("change", popolaDate);
+	document.getElementById("partenza").addEventListener("change", calcolaDistanza);
+	document.getElementById("arrivo").addEventListener("change", calcolaDistanza);
+	document.getElementById("tempKM").addEventListener("input", calcolaRimborso);
 	   
 });
 
@@ -700,12 +704,7 @@ function calcolaRimborso() {
     document.getElementById("rimborsoKMtmp").value = tariffa * km;
 }
 
-// Event listeners
-// Event listeners
-document.getElementById("idMissioneRK").addEventListener("change", popolaDate);
-document.getElementById("partenza").addEventListener("change", calcolaDistanza);
-document.getElementById("arrivo").addEventListener("change", calcolaDistanza);
-document.getElementById("tempKM").addEventListener("input", calcolaRimborso);
+
 
 // Chiamate iniziali
 popolaIndirizzi("partenza");
