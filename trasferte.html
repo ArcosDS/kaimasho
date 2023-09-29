@@ -59,7 +59,7 @@
             <label for="veicolo">Veicolo:</label>
             <input type="text" id="veicolo" name="veicolo" value="BMW X1 25e">
             <label for="tariffa">Tariffa ACI rimborso chilometrico:</label>
-            <input type="text" id="tariffa" name="tariffa" value="0,58€"  oninput="updateCalculatedFields()">
+            <input type="text" id="tariffa" name="tariffa" value="0.58€"  oninput="updateCalculatedFields()">
         </div>        
     </form>
 	<div class="riepilogo-intestazione">
@@ -165,7 +165,7 @@
 	<!-- Missione -->
 	<div class="input-container">
 	    <label for="idMissioneRK">Missione</label>
-	    <select id="idMissioneRK" class="editable-dropdown"></select>
+	    <select id="idMissioneRK" class="editable-dropdown" onchange="aggiornaDate()"></select>
 	    <label id="missioneDescRK"></label>			
 	</div>
 
@@ -179,7 +179,7 @@
 	<!-- Indirizzo di Partenza -->
 	<div class="input-container">
 	    <label for="partenza">Indirizzo di Partenza</label>
-	    <select id="partenza" class="editable-dropdown"></select>
+	    <select id="partenza" onchange="aggiornaDistanza()"></select>
 	    <label id="indirizzoPartenza"></label>
 	    <label id="capPartenza"></label>
 	    <label id="cittaPartenza"></label>
@@ -188,7 +188,7 @@
 	<!-- Indirizzo di Arrivo -->
 	<div class="input-container">
 	    <label for="arrivo">Indirizzo di Arrivo</label>
-	    <select id="arrivo" class="editable-dropdown"></select>
+		<select id="arrivo" onchange="aggiornaDistanza()"></select>
 	    <label id="indirizzoArrivo"></label>
 	    <label id="capArrivo"></label>
 	    <label id="cittaArrivo"></label>
@@ -196,9 +196,10 @@
 
 	<!-- Note -->
 	<div class="input-container">
-	    <label for="noteRK">Note</label>
-	    <select id="noteRK" class="editable-dropdown"></select>
-	</div>       
+		<label for="noteRK">Note</label>
+		<select id="noteRK" onchange="mostraInputNote()"></select>
+		<input type="text" id="inputNote" style="display: none;" onblur="aggiornaNota()">
+	</div>     
 
         <!-- Bottone per aggiungere una nuova trasferta -->
         <button type="submit" id="aggiungiRK">Aggiungi Rimborso Chilometrico</button>

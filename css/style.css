@@ -78,3 +78,9 @@ input[readonly] {
     background-color: #0056b3; /* Cambia il colore di sfondo al passaggio del mouse */
 }
 
+#inputNote {
+    border: 1px solid #ccc;
+    padding: 5px;
+    margin-top: 5px;
+    width: 100%;
+}

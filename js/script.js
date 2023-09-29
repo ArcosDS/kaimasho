@@ -1,6 +1,30 @@
-// Inizializza una variabile per l'oggetto Missione
+9// Inizializza una variabile per l'oggetto Missione
 let missioni = [];
 let totali = [];
+// Definisci una variabile JavaScript e assegna il tuo oggetto JSON ad essa
+  var configData = {
+    "descrizioneMissioni": [
+      { "codice": "001", "descrizione": "Missione A" },
+      { "codice": "002", "descrizione": "Missione B" },
+      // Altri elementi dell'array...
+    ],
+    // Altre proprietà dell'oggetto JSON...
+  };
+// Variabile di sessione per gli indirizzi (esempio)
+let indirizzi = [
+    { id: 1, nome: "Casa Sestino", dettagli: { via: "Via Marche 37", cap: "52038", citta: "Sestino (AR)" } },
+    { id: 2, nome: "Casa Monterotondo", dettagli: { via: "Via Dei Frati Minori 10", cap: "00015", citta: "Monterotondo (RM)" } },
+    // ... altri indirizzi
+];
+
+// Variabile di sessione per le note (esempio)
+let note = ["Nota 1", "Nota 2", ""];
+
+// Variabile di sessione per le distanze (esempio)
+let distanze = [
+    { tratta: [1, 2], distanza: 350 },
+    // ... altre tratte
+];
 
 
 
@@ -519,13 +543,12 @@ document.addEventListener("DOMContentLoaded", function () {
 			missione[field] = newValue;
 		}
 	}
+	
+	// Chiamate iniziali
+	popolaIndirizzi("partenza");
+	popolaIndirizzi("arrivo");
+	popolaNote();
 
-	// Event listeners
-	document.getElementById("idMissioneRK").addEventListener("change", popolaDate);
-	document.getElementById("partenza").addEventListener("change", calcolaDistanza);
-	document.getElementById("arrivo").addEventListener("change", calcolaDistanza);
-	document.getElementById("tempKM").addEventListener("input", calcolaRimborso);
-	   
 });
 
 
@@ -612,35 +635,20 @@ function setDescrizioneMissioniDropDown(id){
 }
 
 
-// Definisci una variabile JavaScript e assegna il tuo oggetto JSON ad essa
-  var configData = {
-    "descrizioneMissioni": [
-      { "codice": "001", "descrizione": "Missione A" },
-      { "codice": "002", "descrizione": "Missione B" },
-      // Altri elementi dell'array...
-    ],
-    // Altre proprietà dell'oggetto JSON...
-  };
-// Variabile di sessione per gli indirizzi (esempio)
-let indirizzi = [
-    { id: 1, nome: "Indirizzo A", dettagli: { via: "Via A", cap: "00100", citta: "Roma" } },
-    { id: 2, nome: "Indirizzo B", dettagli: { via: "Via B", cap: "20100", citta: "Milano" } },
-    // ... altri indirizzi
-];
-
-// Variabile di sessione per le note (esempio)
-let note = ["Nota 1", "Nota 2", ""];
-
-// Variabile di sessione per le distanze (esempio)
-let distanze = [
-    { tratta: [1, 2], distanza: 10 },
-    // ... altre tratte
-];
 
 // Funzione per popolare il dropdown delle missioni
 function popolaMissioni() {
     let select = document.getElementById("idMissioneRK");
     select.innerHTML = ""; // Pulisci le opzioni esistenti
+    // Crea un nuovo elemento opzione
+	var eoption = document.createElement("option");
+
+	// Imposta il testo e il valore per l'opzione "Nessuna selezione"
+	eoption.text = "seleziona missione";
+	eoption.value = "";
+
+	// Aggiungi l'opzione al campo select
+	select.add(eoption, select.options[0]);
     missioni.forEach(missione => {
         let option = document.createElement("option");
         option.value = missione.id;
@@ -652,8 +660,19 @@ function popolaMissioni() {
 // Funzione per popolare il dropdown delle date
 function popolaDate() {
     let select = document.getElementById("dataMissioneRK");
+    select.innerHTML = "";
+
+	// Crea un nuovo elemento opzione
+	var option = document.createElement("option");
+
+	// Imposta il testo e il valore per l'opzione "Nessuna selezione"
+	option.text = "seleziona data";
+	option.value = "";
+
+	// Aggiungi l'opzione al campo select
+	select.add(option, select.options[0]);
     let idMissioneSelezionata = document.getElementById("idMissioneRK").value;
-    let missione = missioni.find(m => m.idMissione == idMissioneSelezionata);
+    let missione = missioni.find(m => m.id == idMissioneSelezionata);
     let dataInizio = new Date(missione.dataInizio);
     let dataFine = new Date(missione.dataFine);
     while (dataInizio <= dataFine) {
@@ -704,11 +723,43 @@ function calcolaRimborso() {
     document.getElementById("rimborsoKMtmp").value = tariffa * km;
 }
 
+function aggiornaDate() {
+    let idMissioneSelezionata = document.getElementById("idMissioneRK").value;
+    let missione = missioni.find(m => m.id == idMissioneSelezionata);
+    if (missione) {
+       popolaDate();
+    }
+}
+
+function aggiornaDistanza() {
+    calcolaDistanza();
+    calcolaRimborso();
+}
+
+function mostraInputNote() {
+    let select = document.getElementById("noteRK");
+    let input = document.getElementById("inputNote");
+    
+    if (select.value) {
+        input.value = select.value;
+        input.style.display = "block";
+        input.focus();
+    } else {
+        input.style.display = "none";
+    }
+}
+
+function aggiornaNota() {
+    let select = document.getElementById("noteRK");
+    let input = document.getElementById("inputNote");
+    
+    let notaSelezionata = select.options[select.selectedIndex];
+    notaSelezionata.text = input.value;
+    notaSelezionata.value = input.value;
+    
+    input.style.display = "none";
+}
 
 
-// Chiamate iniziali
-popolaIndirizzi("partenza");
-popolaIndirizzi("arrivo");
-popolaNote();
 
   
