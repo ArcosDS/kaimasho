@@ -70,6 +70,9 @@ function aggiungiMissione(id, dataInizio, giornoInizio, dataFine, giornoFine, de
 
     // Salva l'array delle Missioni nella sessione
     sessionStorage.setItem('missioni', JSON.stringify(missioni));
+    // Chiamate iniziali
+    popolaMissioni();
+
 
 }
 
@@ -614,3 +617,99 @@ function setDescrizioneMissioniDropDown(id){
     ],
     // Altre proprietà dell'oggetto JSON...
   };
+// Variabile di sessione per gli indirizzi (esempio)
+let indirizzi = [
+    { id: 1, nome: "Indirizzo A", dettagli: { via: "Via A", cap: "00100", citta: "Roma" } },
+    { id: 2, nome: "Indirizzo B", dettagli: { via: "Via B", cap: "20100", citta: "Milano" } },
+    // ... altri indirizzi
+];
+
+// Variabile di sessione per le note (esempio)
+let note = ["Nota 1", "Nota 2", ""];
+
+// Variabile di sessione per le distanze (esempio)
+let distanze = [
+    { tratta: [1, 2], distanza: 10 },
+    // ... altre tratte
+];
+
+// Funzione per popolare il dropdown delle missioni
+function popolaMissioni() {
+    let select = document.getElementById("idMissioneRK");
+    select.innerHTML = ""; // Pulisci le opzioni esistenti
+    missioni.forEach(missione => {
+        let option = document.createElement("option");
+        option.value = missione.id;
+        option.textContent = "Missione " + missione.id;
+        select.appendChild(option);
+    });
+}
+
+// Funzione per popolare il dropdown delle date
+function popolaDate() {
+    let select = document.getElementById("dataMissioneRK");
+    let idMissioneSelezionata = document.getElementById("idMissioneRK").value;
+    let missione = missioni.find(m => m.idMissione == idMissioneSelezionata);
+    let dataInizio = new Date(missione.dataInizio);
+    let dataFine = new Date(missione.dataFine);
+    while (dataInizio <= dataFine) {
+        let option = document.createElement("option");
+        option.value = dataInizio.toISOString().split("T")[0];
+        option.textContent = dataInizio.toISOString().split("T")[0];
+        select.appendChild(option);
+        dataInizio.setDate(dataInizio.getDate() + 1);
+    }
+}
+
+// Funzione per popolare il dropdown degli indirizzi
+function popolaIndirizzi(idSelect) {
+    let select = document.getElementById(idSelect);
+    indirizzi.forEach(indirizzo => {
+        let option = document.createElement("option");
+        option.value = indirizzo.id;
+        option.textContent = indirizzo.nome;
+        select.appendChild(option);
+    });
+}
+
+// Funzione per popolare il dropdown delle note
+function popolaNote() {
+    let select = document.getElementById("noteRK");
+    note.forEach(nota => {
+        let option = document.createElement("option");
+        option.value = nota;
+        option.textContent = nota;
+        select.appendChild(option);
+    });
+}
+
+// Funzione per calcolare la distanza
+function calcolaDistanza() {
+    let partenza = document.getElementById("partenza").value;
+    let arrivo = document.getElementById("arrivo").value;
+    let trattaSelezionata = distanze.find(d => (d.tratta.includes(parseInt(partenza)) && d.tratta.includes(parseInt(arrivo))));
+    if (trattaSelezionata) {
+        document.getElementById("tempKM").value = trattaSelezionata.distanza;
+    }
+}
+
+// Funzione per calcolare il rimborso
+function calcolaRimborso() {
+    let tariffa = parseFloat(document.getElementById("tariffa").value);
+    let km = parseFloat(document.getElementById("tempKM").value);
+    document.getElementById("rimborsoKMtmp").value = tariffa * km;
+}
+
+// Event listeners
+// Event listeners
+document.getElementById("idMissioneRK").addEventListener("change", popolaDate);
+document.getElementById("partenza").addEventListener("change", calcolaDistanza);
+document.getElementById("arrivo").addEventListener("change", calcolaDistanza);
+document.getElementById("tempKM").addEventListener("input", calcolaRimborso);
+
+// Chiamate iniziali
+popolaIndirizzi("partenza");
+popolaIndirizzi("arrivo");
+popolaNote();
+
+  

@@ -162,38 +162,43 @@
     <form id="formRimborsiChilometrici" class="form-missioni">
 	<h2>Rimborsi Chilometrici</h2>
 	
-		<div class="input-container">
-            <label for="idMissioneRK">Missione</label>
-            <select id="idMissioneRK" class="editable-dropdown"></select>
-			<label id="missioneDescRK"></label>			
-        </div>
-		
-		<div class="input-container">
-            <label for="dataMissioneRK">Giorno</label>
-            <select id="dataMissioneRK" class="editable-dropdown"></select>
-			<label id="giornoMissioneRK"></label>			
-        </div>
+	<!-- Missione -->
+	<div class="input-container">
+	    <label for="idMissioneRK">Missione</label>
+	    <select id="idMissioneRK" class="editable-dropdown"></select>
+	    <label id="missioneDescRK"></label>			
+	</div>
 
-        <div class="input-container">
-            <label for="partenza" oninput="updateIndirizzoPartenzaLabel()">Indirizzo di Partenza</label>
-            <select  id="partenza" class="editable-dropdown"></select>
-            <label id="indirizzoPartenza"></label>
-			<label id="capPartenza"></label>
-			<label id="cittaPartenza"></label>
-        </div>
+	<!-- Data Missione -->
+	<div class="input-container">
+	    <label for="dataMissioneRK">Giorno</label>
+	    <select id="dataMissioneRK" class="editable-dropdown"></select>
+	    <label id="giornoMissioneRK"></label>			
+	</div>
 
-        <div class="input-container">
-            <label for="arrivo" oninput="updateIndirizzoArrivoLabel()">Indirizzo di Arrivo</label>
-            <select id="arrivo" class="editable-dropdown"></select>
-            <label id="indirizzoArrivo"></label>
-			<label id="capArrivo"></label>
-			<label id="cittaArrivo"></label>
-        </div>
+	<!-- Indirizzo di Partenza -->
+	<div class="input-container">
+	    <label for="partenza">Indirizzo di Partenza</label>
+	    <select id="partenza" class="editable-dropdown"></select>
+	    <label id="indirizzoPartenza"></label>
+	    <label id="capPartenza"></label>
+	    <label id="cittaPartenza"></label>
+	</div>
 
-        <div class="input-container">
-            <label for="noteRK">Note</label>
-            <select id="noteRK" class="editable-dropdown"></select>
-        </div>        
+	<!-- Indirizzo di Arrivo -->
+	<div class="input-container">
+	    <label for="arrivo">Indirizzo di Arrivo</label>
+	    <select id="arrivo" class="editable-dropdown"></select>
+	    <label id="indirizzoArrivo"></label>
+	    <label id="capArrivo"></label>
+	    <label id="cittaArrivo"></label>
+	</div>
+
+	<!-- Note -->
+	<div class="input-container">
+	    <label for="noteRK">Note</label>
+	    <select id="noteRK" class="editable-dropdown"></select>
+	</div>       
 
         <!-- Bottone per aggiungere una nuova trasferta -->
         <button type="submit" id="aggiungiRK">Aggiungi Rimborso Chilometrico</button>
