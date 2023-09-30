@@ -766,14 +766,15 @@ function aggiungiRimborsoChilometrico() {
     // Ottieni i valori dai campi di input
     let idMissione = document.getElementById("idMissioneRK").value;
     let dataMissione = document.getElementById("dataMissioneRK").value;
-    let partenzaId = document.getElementById("partenza").value;
-	let arrivoId = document.getElementById("partenza").value;
+	let partenzaId = document.getElementById("partenza").value; // Assumendo che "partenza" sia l'ID del campo di input
+	let arrivoId = document.getElementById("arrivo").value; // Assumendo che "arrivo" sia l'ID del campo di input
 
-	let partenzaIndirizzo = document.getElementById(partenzaId).innerText;
-	let arrivoIndirizzo = document.getElementById(arrivoId).innerText;
+	let partenzaObj = indirizzi.find(indirizzo => indirizzo.id == partenzaId);
+	let arrivoObj = indirizzi.find(indirizzo => indirizzo.id == arrivoId);
 
-    let partenza = document.getElementById("partenza").value;
-    let arrivo = document.getElementById("arrivo").value;
+	let partenzaIndirizzoCompleto = `${partenzaObj.indirizzo}, ${partenzaObj.citta}, ${partenzaObj.cap}`;
+	let arrivoIndirizzoCompleto = `${arrivoObj.indirizzo}, ${arrivoObj.citta}, ${arrivoObj.cap}`;
+
     let note = document.getElementById("noteRK").value;
     let tempKM = document.getElementById("tempKM").value;
     let rimborsoKMtmp = document.getElementById("rimborsoKMtmp").value;
@@ -786,21 +787,28 @@ function aggiungiRimborsoChilometrico() {
     
 	
     
-    let row = table.insertRow(-2);
+    const row = document.createElement("tr");
     row.insertCell(0).innerHTML = idMissione;
     row.insertCell(1).innerHTML = dataMissione;
-    row.insertCell(2).innerHTML = partenza;
-    row.insertCell(3).innerHTML = arrivo;
-    row.insertCell(4).innerHTML = note;
+    row.insertCell(2).innerHTML = getGiornoSettimanaItaliano(new Date(dataMissione));
+    row.insertCell(3).innerHTML = partenzaIndirizzoCompleto;
+    row.insertCell(4).innerHTML = arrivoIndirizzoCompleto;
     row.insertCell(5).innerHTML = tempKM;
-    row.insertCell(6).innerHTML = rimborsoKMtmp;
+    row.insertCell(6).innerHTML = note;
+    row.insertCell(7).innerHTML = rimborsoKMtmp;
+
+		
+		
+
+		// Aggiungi la riga al corpo della tabella
+		tableBody.appendChild(newRow);
 
     // Aggiungi i valori alla variabile di sessione
     let rimborso = {
         idMissione: idMissione,
         dataMissione: dataMissione,
-        partenza: partenza,
-        arrivo: arrivo,
+        partenza: partenzaIndirizzoCompleto,
+        arrivo: arrivoIndirizzoCompleto,
         note: note,
         tempKM: tempKM,
         rimborsoKMtmp: rimborsoKMtmp
