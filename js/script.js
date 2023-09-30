@@ -38,6 +38,7 @@ function aggiornaTotali() {
 	let totalGiorniEstera = 0;
 	let totalGiorniNazionale = 0;
 	let totalCostoTrasferte = 0;
+	let totalRimborsiKM = 0;
 
 	missioni.forEach((missione) => {
 		totalCostoTrasferte += parseFloat(missione.costo);
@@ -49,12 +50,24 @@ function aggiornaTotali() {
 			totalGiorniNazionale += parseInt(missione.numeroGiorni);
 		}
 	});
+	
+	rimborsiChilometrici.forEach((rimborso) => {
+        totalRimborsiKM += parseFloat(rimborso.rimborso); // Assumendo che ogni rimborso abbia un campo 'totale'
+    });
+
 
 	// Aggiorna i totali nella tabella dei totali
 	document.getElementById("totaleCostoTrasferte").textContent = totalCostoTrasferte.toFixed(2) + " €";
 	document.getElementById("totaleGiorniTrasferta").textContent = totalGiorniTrasferta;
 	document.getElementById("totaleGiorniEstera").textContent = totalGiorniEstera;
 	document.getElementById("totaleGiorniNazionale").textContent = totalGiorniNazionale;
+	
+	// Aggiorna i totali nella tabella dei rimborsi chilometrici
+    document.getElementById("totaleRimborsiKM").textContent = totalRimborsiKM.toFixed(2) + " €";
+
+    // Aggiorna il rimborso totale
+    let rimborsoTotale = totalCostoTrasferte + totalRimborsiKM;
+    document.getElementById("rimborsoTotale").value = rimborsoTotale.toFixed(2); // arrotonda a 2 decimali
 }
 
 function setMeseAnnoDefault(){
@@ -772,8 +785,8 @@ function aggiungiRimborsoChilometrico() {
 	let partenzaObj = indirizzi.find(indirizzo => indirizzo.id == partenzaId);
 	let arrivoObj = indirizzi.find(indirizzo => indirizzo.id == arrivoId);
 
-	let partenzaIndirizzoCompleto = `${partenzaObj.indirizzo}, ${partenzaObj.citta}, ${partenzaObj.cap}`;
-	let arrivoIndirizzoCompleto = `${arrivoObj.indirizzo}, ${arrivoObj.citta}, ${arrivoObj.cap}`;
+	let partenzaIndirizzoCompleto = `${partenzaObj.dettagli.via}, ${partenzaObj.dettagli.citta}, ${partenzaObj.dettagli.cap}`;
+	let arrivoIndirizzoCompleto = `${arrivoObj.dettagli.via}, ${arrivoObj.dettagli.citta}, ${arrivoObj.dettagli.cap}`;
 
     let note = document.getElementById("noteRK").value;
     let tempKM = document.getElementById("tempKM").value;
@@ -782,8 +795,8 @@ function aggiungiRimborsoChilometrico() {
 
 
     // Aggiungi i valori alla tabella
-    let table = document.getElementById("RKTable");
-    
+
+    let tableBody = document.getElementById("RKTableBody");
     
 	
     
@@ -801,7 +814,7 @@ function aggiungiRimborsoChilometrico() {
 		
 
 		// Aggiungi la riga al corpo della tabella
-		tableBody.appendChild(newRow);
+		tableBody.appendChild(row);
 
     // Aggiungi i valori alla variabile di sessione
     let rimborso = {
@@ -810,10 +823,11 @@ function aggiungiRimborsoChilometrico() {
         partenza: partenzaIndirizzoCompleto,
         arrivo: arrivoIndirizzoCompleto,
         note: note,
-        tempKM: tempKM,
-        rimborsoKMtmp: rimborsoKMtmp
+        KM: tempKM,
+        rimborso: rimborsoKMtmp
     };
     rimborsiChilometrici.push(rimborso);
+    aggiornaTotali();
 }
 
 
