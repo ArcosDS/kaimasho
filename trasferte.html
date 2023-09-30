@@ -199,11 +199,10 @@
 		<label for="noteRK">Note</label>
 		<select id="noteRK" onchange="mostraInputNote()"></select>
 		<input type="text" id="inputNote" style="display: none;" onblur="aggiornaNota()">
-	</div>     
-
-        <!-- Bottone per aggiungere una nuova trasferta -->
-        <button type="submit" id="aggiungiRK">Aggiungi Rimborso Chilometrico</button>
+	</div>             
     </form>
+    <!-- Bottone per aggiungere una nuova trasferta -->
+    <button id="aggiungiRK" onClick="aggiungiRimborsoChilometrico()">Aggiungi Rimborso Chilometrico</button>
 
     <div class="riepilogo-RK">
         <h3>totali provvisori</h3>

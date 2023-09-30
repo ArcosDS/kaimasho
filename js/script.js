@@ -1,5 +1,7 @@
 9// Inizializza una variabile per l'oggetto Missione
 let missioni = [];
+let rimborsiChilometrici = [];
+
 let totali = [];
 // Definisci una variabile JavaScript e assegna il tuo oggetto JSON ad essa
   var configData = {
@@ -760,6 +762,51 @@ function aggiornaNota() {
     input.style.display = "none";
 }
 
+function aggiungiRimborsoChilometrico() {
+    // Ottieni i valori dai campi di input
+    let idMissione = document.getElementById("idMissioneRK").value;
+    let dataMissione = document.getElementById("dataMissioneRK").value;
+    let partenzaId = document.getElementById("partenza").value;
+	let arrivoId = document.getElementById("partenza").value;
+
+	let partenzaIndirizzo = document.getElementById(partenzaId).innerText;
+	let arrivoIndirizzo = document.getElementById(arrivoId).innerText;
+
+    let partenza = document.getElementById("partenza").value;
+    let arrivo = document.getElementById("arrivo").value;
+    let note = document.getElementById("noteRK").value;
+    let tempKM = document.getElementById("tempKM").value;
+    let rimborsoKMtmp = document.getElementById("rimborsoKMtmp").value;
+    
+
+
+    // Aggiungi i valori alla tabella
+    let table = document.getElementById("RKTable");
+    
+    
+	
+    
+    let row = table.insertRow(-2);
+    row.insertCell(0).innerHTML = idMissione;
+    row.insertCell(1).innerHTML = dataMissione;
+    row.insertCell(2).innerHTML = partenza;
+    row.insertCell(3).innerHTML = arrivo;
+    row.insertCell(4).innerHTML = note;
+    row.insertCell(5).innerHTML = tempKM;
+    row.insertCell(6).innerHTML = rimborsoKMtmp;
+
+    // Aggiungi i valori alla variabile di sessione
+    let rimborso = {
+        idMissione: idMissione,
+        dataMissione: dataMissione,
+        partenza: partenza,
+        arrivo: arrivo,
+        note: note,
+        tempKM: tempKM,
+        rimborsoKMtmp: rimborsoKMtmp
+    };
+    rimborsiChilometrici.push(rimborso);
+}
 
 
   
