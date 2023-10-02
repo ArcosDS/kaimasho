@@ -1,4 +1,5 @@
-9// Inizializza una variabile per l'oggetto Missione
+//=============================== VARIABILI GLOBALI =====================================
+// Inizializza una variabile per l'oggetto Missione
 let missioni = [];
 let rimborsiChilometrici = [];
 
@@ -6,31 +7,47 @@ let totali = [];
 // Definisci una variabile JavaScript e assegna il tuo oggetto JSON ad essa
 var configData = {
 "descrizioneMissioni": [
-  { "codice": "001", "descrizione": "Missione A" },
+  { "codice": "001", "descrizione": "Rimborso forfettario spese di trasferta ufficio cliente Kearney Roma. (Art. 51 comma 5 dpr 917/86)" },
   { "codice": "002", "descrizione": "Missione B" },
   // Altri elementi dell'array...
 ],
+"trasferteDefault": [
+	{ "giorno": 1, "partenza" : 1, "destinazione": 3, note: ""},
+	{ "giorno": 1, "partenza" : 3, "destinazione": 2, note: ""},
+	{ "giorno": 2, "partenza" : 2, "destinazione": 3, note: ""},
+	{ "giorno": 2, "partenza" : 3, "destinazione": 2, note: ""},
+	{ "giorno": 3, "partenza" : 2, "destinazione": 3, note: ""},
+	{ "giorno": 3, "partenza" : 3, "destinazione": 2, note: ""},
+	{ "giorno": 4, "partenza" : 2, "destinazione": 3, note: ""},
+	{ "giorno": 4, "partenza" : 3, "destinazione": 2, note: ""},
+	{ "giorno": 5, "partenza" : 2, "destinazione": 3, note: ""},
+	{ "giorno": 5, "partenza" : 3, "destinazione": 1, note: ""}
+  // Altri elementi dell'array...
+],
+"distanze": [
+    { tratta: [1, 2], distanza: 256 },
+    { tratta: [2, 3], distanza: 25 },
+    { tratta: [1, 3], distanza: 271 }
+    // ... altre tratte
+]
 // Altre proprietà dell'oggetto JSON...
 };
+
+
 // Variabile di sessione per gli indirizzi (esempio)
 let indirizzi = [
     { id: 1, nome: "Casa Sestino", dettagli: { via: "Via Marche 37", cap: "52038", citta: "Sestino (AR)" } },
     { id: 2, nome: "Casa Monterotondo", dettagli: { via: "Via Dei Frati Minori 10", cap: "00015", citta: "Monterotondo (RM)" } },
+    { id: 3, nome: "Kearney Roma", dettagli: { via: "Via Piemonte 127", cap: "00187", citta: "Roma" } }
     // ... altri indirizzi
 ];
 
+
 // Variabile di sessione per le note (esempio)
-let note = ["Nota 1", "Nota 2", ""];
-
-// Variabile di sessione per le distanze (esempio)
-let distanze = [
-    { tratta: [1, 2], distanza: 350 },
-    // ... altre tratte
-];
+let note = ["A/R", "Nota 2", ""];
 
 
-
-
+//======================== Funzioni Globali ==================================
 
 // Funzione per calcolare i totali e aggiornare la tabella dei totali
 function aggiornaTotali() {
@@ -88,6 +105,94 @@ function setMeseAnnoDefault(){
 	document.getElementById("periodo").value = valorePredefinito;
 }
 
+
+// Funzione per ottenere il giorno della settimana in italiano
+function getGiornoSettimanaItaliano(date) {
+	const giorniSettimana = [
+		"Domenica",
+		"Lunedì",
+		"Martedì",
+		"Mercoledì",
+		"Giovedì",
+		"Venerdì",
+		"Sabato",
+	];
+	return giorniSettimana[date.getDay()];
+}
+
+
+
+// Funzione per calcolare il costo totale delle trasferte
+function updateTotalCost() {
+	let totalCost = 0;
+	let totalGiorniNazionale = 0;
+	let totalGiorniEstera = 0;
+	const tableBody = document.getElementById("trasferteTableBody");
+	const rows = tableBody.querySelectorAll("tr");
+	
+	// Specifica il valore dell'attributo "name" che stai cercando
+	const nomeAttributo = "costoMissione";
+
+	// Trova tutti gli elementi con l'attributo "name" specifico
+	const costiMissione = document.querySelectorAll(`[name="${nomeAttributo}"]`);
+
+	// Crea un array per memorizzare i valori dei vari elementi
+	const valoriAttributo = [];
+
+	// Itera attraverso gli elementi e ottieni il valore dell'attributo "name"
+	costiMissione.forEach(function(elemento) {
+		const valoreAttributo = parseFloat(elemento.value);
+		totalCost+=valoreAttributo;
+		valoriAttributo.push(valoreAttributo);
+	});
+	const totaleCostoTrasferte = document.getElementById("totaleCostoTrasferte");
+	// Aggiorna il totale nel documento
+	totaleCostoTrasferte.textContent = totalCost.toFixed(2) + " €";
+}
+
+function updateCalculatedFields(){
+	//aggiorna totali
+	aggiornaCostoProvvisorio();
+	aggiornaGiorniProvvisori();
+	aggiornaMissioni();
+	aggiornaTotali();
+}
+
+
+
+//==================================== MISSIONI ==========================================
+
+
+// Calcolo dei giorni della trasferta
+function calcolaGiorniTrasferta(dataInizio, dataFine) {
+	// Calcola il numero di giorni tra la data di inizio e la data di fine
+	const millisecondsInDay = 24 * 60 * 60 * 1000;
+	const numeroGiorni = Math.round((dataFine - dataInizio) / millisecondsInDay) + 1;
+	return numeroGiorni;
+}
+
+
+
+// Calcolo dei giorni della trasferta
+function calcolaCostoTrasfertaParam(giornoIn, giornoFin, trasfertaEstera) {
+	const dataFine = giornoFin;
+	const dataInizio = giornoIn;
+	const giorni = calcolaGiorniTrasferta(new Date(dataInizio), new Date(dataFine));
+
+	let costoGiornaliero = parseFloat(document.getElementById("forfettarioNazionale").value);
+
+	// Verifica se la trasferta è estera e imposta il costo giornaliero
+	if (trasfertaEstera) {
+		costoGiornaliero = parseFloat(document.getElementById("forfettarioEstero").value);
+	}
+
+	// Calcola il costo della trasferta in base al costo giornaliero
+	const costoTrasferta = giorni * costoGiornaliero;
+
+	return costoTrasferta;
+}
+
+
 // Funzione per aggiungere una nuova Missione all'oggetto e salvarlo nella sessione
 function aggiungiMissione(id, dataInizio, giornoInizio, dataFine, giornoFine, descrizione, numeroGiorni, costo, trasfertaEstera) {
 
@@ -126,99 +231,50 @@ function calcolaNuovoId() {
     return massimoId + 1;
 }
 
-// Funzione per ottenere il giorno della settimana in italiano
-function getGiornoSettimanaItaliano(date) {
-	const giorniSettimana = [
-		"Domenica",
-		"Lunedì",
-		"Martedì",
-		"Mercoledì",
-		"Giovedì",
-		"Venerdì",
-		"Sabato",
-	];
-	return giorniSettimana[date.getDay()];
-}
 
-// Funzione per aggiornare il totale dei giorni
-function updateTotalGiorni() {
-	const nomeAttributo = "numeroGiorni";
+function aggiornaMissioni() {
+    // Recupera i nuovi valori dei costi forfettari
+    const costoForfettarioNazionale = parseFloat(document.getElementById("forfettarioNazionale").value);
+    const costoForfettarioEstero = parseFloat(document.getElementById("forfettarioEstero").value);
 
-	// Trova tutti gli elementi con l'attributo "name" specifico
-	const giorniMissione = document.querySelectorAll(`[name="${nomeAttributo}"]`);
-	let totalGiorni = 0;
-	let totaleGiorniE = 0;
-	let totaleGiorniN = 0;
-	giorniMissione.forEach(function (elemento) {
-		const valoreAttributo = parseInt(elemento.value);
-		const idElement = (elemento.id).split("_")[1]
-		if((document.getElementById("trasfertaEstera_"+idElement)).checked)
-			totaleGiorniE += valoreAttributo;
-		else
-			totaleGiorniN += valoreAttributo;
-		totalGiorni += valoreAttributo;
-	});
+    // Itera su tutte le missioni e aggiorna i costi in base ai nuovi valori
+    for (const missione of missioni) {
+        const numeroGiorni = missione.numeroGiorni;
+        let costo = 0;
 
-	// Aggiorna il totale nel documento
-	document.getElementById("totaleGiorniTrasferta").textContent = totalGiorni;
-	document.getElementById("totaleGiorniEstera").textContent = totaleGiorniE;
-	document.getElementById("totaleGiorniNazionale").textContent = totaleGiorniN;
-	
-}
+        if (missione.trasfertaEstera) {
+            costo = costoForfettarioEstero * numeroGiorni;
+        } else {
+            costo = costoForfettarioNazionale * numeroGiorni;
+        }
 
-// Funzione per calcolare il costo totale delle trasferte
-function updateTotalCost() {
-	let totalCost = 0;
-	let totalGiorniNazionale = 0;
-	let totalGiorniEstera = 0;
-	const tableBody = document.getElementById("trasferteTableBody");
-	const rows = tableBody.querySelectorAll("tr");
-	
-	// Specifica il valore dell'attributo "name" che stai cercando
-	const nomeAttributo = "costoMissione";
+        // Aggiorna il costo nella missione
+        missione.costo = costo;
+    }
 
-	// Trova tutti gli elementi con l'attributo "name" specifico
-	const costiMissione = document.querySelectorAll(`[name="${nomeAttributo}"]`);
+    // Aggiorna tutte le righe della tabella
+    const tableBody = document.getElementById("trasferteTableBody");
+    const rows = tableBody.querySelectorAll("tr");
 
-	// Crea un array per memorizzare i valori dei vari elementi
-	const valoriAttributo = [];
+    rows.forEach((row) => {
+        const id = parseInt(row.querySelector("td:first-child").textContent);
+        const missione = missioni.find((m) => m.id === id);
 
-	// Itera attraverso gli elementi e ottieni il valore dell'attributo "name"
-	costiMissione.forEach(function(elemento) {
-		const valoreAttributo = parseFloat(elemento.value);
-		totalCost+=valoreAttributo;
-		valoriAttributo.push(valoreAttributo);
-	});
-	const totaleCostoTrasferte = document.getElementById("totaleCostoTrasferte");
-	// Aggiorna il totale nel documento
-	totaleCostoTrasferte.textContent = totalCost.toFixed(2) + " €";
-}
+        if (missione) {
+            // Aggiorna i valori delle celle nella riga
+            row.querySelector("td:nth-child(7)").textContent = missione.numeroGiorni;
 
-// Calcolo dei giorni della trasferta
-function calcolaGiorniTrasferta(dataInizio, dataFine) {
-	// Calcola il numero di giorni tra la data di inizio e la data di fine
-	const millisecondsInDay = 24 * 60 * 60 * 1000;
-	const numeroGiorni = Math.round((dataFine - dataInizio) / millisecondsInDay) + 1;
-	return numeroGiorni;
-}
+            row.querySelector('input[data-field="costo"]').value = missione.costo.toFixed(2);
 
+            // Aggiorna il checkbox "Trasferta Estera"
+            const checkbox = row.querySelector("td:nth-child(9) input");
+            checkbox.checked = missione.trasfertaEstera;
+        }
+    });
 
-
-// Calcolo dei giorni della trasferta
-function calcolaCostoTrasfertaParam(giornoIn, giornoFin, trasfertaEstera) {
-	const dataFine = giornoFin;
-	const dataInizio = giornoIn;
-	const giorni = calcolaGiorniTrasferta(new Date(dataInizio), new Date(dataFine));
-	let costoGiornaliero = parseFloat(document.getElementById("forfettarioNazionale").value);
-
-	// Verifica se la trasferta è estera e imposta il costo giornaliero
-	if (trasfertaEstera) {
-		costoGiornaliero = parseFloat(document.getElementById("forfettarioEstero").value);
-	}
-
-	// Calcola il costo della trasferta in base al costo giornaliero
-	const costoTrasferta = giorni * costoGiornaliero;
-	return costoTrasferta;
+    // Aggiorna i totali
+    updateTotalCost();
+    updateTotalGiorni();
 }
 
 function aggiornaGiorniProvvisori(){
@@ -263,9 +319,11 @@ function updateMissionRow(id) {
             let costo = estero ? forfettarioEstero * numeroGiorni : forfettarioNazionale * numeroGiorni;
             if (isNaN(costo)) costo = 0;
 
+
             // Aggiorna i valori nei campi della riga
             row.querySelector('[data-field="giornoInizio"]').textContent = giornoInizio;
             row.querySelector('[data-field="giornoFine"]').textContent = giornoFine;
+
             row.querySelector('[data-field="numeroGiorni"]').textContent = numeroGiorni;
             row.querySelector('[data-field="costo"]').value = costo.toFixed(2);
 
@@ -283,89 +341,37 @@ function updateMissionRow(id) {
         aggiornaMissioni();
         aggiornaTotali();
     }
+
 }
+
+// Funzione per aggiornare il totale dei giorni
+function updateTotalGiorni() {
+	const nomeAttributo = "numeroGiorni";
+
+	// Trova tutti gli elementi con l'attributo "name" specifico
+	const giorniMissione = document.querySelectorAll(`[name="${nomeAttributo}"]`);
+	let totalGiorni = 0;
+	let totaleGiorniE = 0;
+	let totaleGiorniN = 0;
+	giorniMissione.forEach(function (elemento) {
+		const valoreAttributo = parseInt(elemento.value);
+		const idElement = (elemento.id).split("_")[1]
+		if((document.getElementById("trasfertaEstera_"+idElement)).checked)
+			totaleGiorniE += valoreAttributo;
+		else
+			totaleGiorniN += valoreAttributo;
+		totalGiorni += valoreAttributo;
+	});
+
+	// Aggiorna il totale nel documento
+	document.getElementById("totaleGiorniTrasferta").textContent = totalGiorni;
+
+	document.getElementById("totaleGiorniEstera").textContent = totaleGiorniE;
+	document.getElementById("totaleGiorniNazionale").textContent = totaleGiorniN;
 	
-
-
-function updateCalculatedFields(){
-	//aggiorna totali
-	aggiornaCostoProvvisorio();
-	aggiornaGiorniProvvisori();
-	aggiornaMissioni();
-	aggiornaTotali();
 }
 
-function aggiornaMissioni() {
-    // Recupera i nuovi valori dei costi forfettari
-    const costoForfettarioNazionale = parseFloat(document.getElementById("forfettarioNazionale").value);
-    const costoForfettarioEstero = parseFloat(document.getElementById("forfettarioEstero").value);
-
-    // Itera su tutte le missioni e aggiorna i costi in base ai nuovi valori
-    for (const missione of missioni) {
-        const numeroGiorni = missione.numeroGiorni;
-        let costo = 0;
-
-        if (missione.trasfertaEstera) {
-            costo = costoForfettarioEstero * numeroGiorni;
-        } else {
-            costo = costoForfettarioNazionale * numeroGiorni;
-        }
-
-        // Aggiorna il costo nella missione
-        missione.costo = costo;
-    }
-
-    // Aggiorna tutte le righe della tabella
-    const tableBody = document.getElementById("trasferteTableBody");
-    const rows = tableBody.querySelectorAll("tr");
-
-    rows.forEach((row) => {
-        const id = parseInt(row.querySelector("td:first-child").textContent);
-        const missione = missioni.find((m) => m.id === id);
-
-        if (missione) {
-            // Aggiorna i valori delle celle nella riga
-            row.querySelector("td:nth-child(7)").textContent = missione.numeroGiorni;
-            row.querySelector('input[data-field="costo"]').value = missione.costo.toFixed(2);
-
-            // Aggiorna il checkbox "Trasferta Estera"
-            const checkbox = row.querySelector("td:nth-child(9) input");
-            checkbox.checked = missione.trasfertaEstera;
-        }
-    });
-
-    // Aggiorna i totali
-    updateTotalCost();
-    updateTotalGiorni();
-}
-
-// Mantieni solo la funzione di aggiornamento delle etichette delle date
-function updateDataLabel(inputId, labelId) {
-    const inputData = document.getElementById(inputId);
-    const inputDate = inputData.value;
-    
-    // Aggiorna l'etichetta della data con il giorno della settimana
-    const labelElement = document.getElementById(labelId);
-    labelElement.textContent = getGiornoSettimanaItaliano(new Date(inputDate));
-}
-
-function updateDataInizioLabel() {
-    updateDataLabel("dataInizio", "giornoInizio");
-	updateCalculatedFields();
-}
-
-function updateDataFineLabel() {
-    updateDataLabel("dataFine", "giornoFine");
-	updateCalculatedFields();
-}
-
-
-// Funzione per aggiungere uno zero davanti a numeri inferiori a 10 (per il formato "dd/mm/yyyy")
-function aggiungiZero(numero) {
-    return numero < 10 ? `0${numero}` : numero;
-}
-
-	// Funzione per aggiungere una nuova riga alla tabella delle trasferte
+// Funzione per aggiungere una nuova riga alla tabella delle trasferte
 	function aggiungiMissioneAllaTabella(id, dataInizio, giornoInizio, dataFine, giornoFine, descrizione, numeroGiorni, costo, trasfertaEstera) {
 		// Seleziona la tabella e il corpo della tabella
 		const table = document.getElementById("trasferteTable");
@@ -418,6 +424,138 @@ function aggiungiZero(numero) {
 		}
 	}
 
+//==================================== RIMBORSI KM ==========================================
+
+
+// Funzione per popolare le tabelle con missioni di default
+function popolaTabelleConRiborsiKM() {
+  missioni.forEach(missione => {
+        let dataInizio = new Date(missione.dataInizio);
+	    let dataFine = new Date(missione.dataFine);
+		while (dataInizio <= dataFine) {
+		    let giornoInizio = dataInizio.getDay();
+			let tratte = configData.trasferteDefault.filter(trasferta => trasferta.giorno === giornoInizio);
+			tratte.forEach(tratta =>{
+				// verificare se la data e' nel formato atteso
+				aggiungiRimborsoKM(missione.id, formatYYYYMMDD(dataInizio), tratta.partenza, tratta.destinazione, tratta.note);
+			});
+		    dataInizio.setDate(dataInizio.getDate() + 1);
+		}
+        
+    });
+}
+
+// Ridisegna la tabella dei rimborsi KM a partire dall'oggetto di sessione che ne contiene i valori
+function aggiornaTabellaRimborsiKM(){
+	let tableBody = document.getElementById("RKTableBody");
+     while (tbody.firstChild) {
+        tbody.removeChild(tbody.firstChild);
+    }    
+	rimborsiChilometrici.forEach(rimbrosoChilometrico =>{
+		aggiungiRigaTabellaRimborsiKm(rimbrosoChilometrico);
+	});
+}
+
+// Ridisegna la tabella dei rimborsi KM a partire dall'oggetto di sessione che ne contiene i valori
+function aggiungiRigaTabellaRimborsiKm(rimborsoDaAggiungere){
+    let tableBody = document.getElementById("RKTableBody");    
+    const row = document.createElement("tr");
+
+    row.id = "rimborsoKmRiga"+rimborsoDaAggiungere.id;
+    row.insertCell(0).innerHTML = rimborsoDaAggiungere.idMissione;
+    row.insertCell(1).innerHTML = rimborsoDaAggiungere.dataMissione;
+    row.insertCell(2).innerHTML = getGiornoSettimanaItaliano(new Date(rimborsoDaAggiungere.dataMissione));
+    row.insertCell(3).innerHTML = rimborsoDaAggiungere.partenza;
+    row.insertCell(4).innerHTML = rimborsoDaAggiungere.arrivo;
+    row.insertCell(5).innerHTML = rimborsoDaAggiungere.KM;
+    row.insertCell(6).innerHTML = rimborsoDaAggiungere.note;
+    row.insertCell(7).innerHTML = rimborsoDaAggiungere.rimborso;
+    row.insertCell(8).innerHTML = `<td><button class="delete-row" onClick="deleteRow(${rimborsoDaAggiungere.id})">X</button></td>`;
+	// Aggiungi la riga al corpo della tabella
+	tableBody.appendChild(row);
+}
+
+// recupera la distanza (in KM con la virgola) tra due punti tra quelli censiti nel configFile a partire dagli id delle tratte
+function recuperaDistanza(idPartenza, idArrivo){
+	let trattaSelezionata = configData.distanze.find(d => (d.tratta.includes(parseInt(idPartenza)) && d.tratta.includes(parseInt(idArrivo))));
+	console.log(parseFloat(trattaSelezionata.distanza));
+	return parseFloat(trattaSelezionata.distanza);
+}
+
+function calcolaRimborsoChilometrico(chilometraggio){
+	let tariffa = parseFloat(document.getElementById("tariffa").value); // valutare se sostituire con variabile di sessione
+	return Math.ceil(parseFloat(tariffa*chilometraggio) * 100) / 100;
+}
+
+
+// Aggiunge un rimborsoKm alla variabile
+// aggiorna la tabella dei rimborsi
+function aggiungiRimborsoKM(idMissione, dataMissione, idPartenza, idArrivo, note){
+
+	let partenzaObj = indirizzi.find(indirizzo => indirizzo.id == idPartenza);
+	let arrivoObj = indirizzi.find(indirizzo => indirizzo.id == idArrivo);
+	let partenzaIndirizzoCompleto = `${partenzaObj.dettagli.via}, ${partenzaObj.dettagli.citta}, ${partenzaObj.dettagli.cap}`;
+	let arrivoIndirizzoCompleto = `${arrivoObj.dettagli.via}, ${arrivoObj.dettagli.citta}, ${arrivoObj.dettagli.cap}`;
+	const idRow = getTrasferteKMId();
+	let chilometraggio =  recuperaDistanza(idPartenza, idArrivo);
+
+	let rimoborsoInEuro = calcolaRimborsoChilometrico(chilometraggio);
+	// Aggiungi i valori alla variabile di sessione
+    let rimborso = {
+    	id: idRow,
+        idMissione: idMissione,
+        dataMissione: dataMissione,
+        idPartenza: idPartenza,
+        partenza: partenzaIndirizzoCompleto,
+        idArrivo: idArrivo,
+        arrivo: arrivoIndirizzoCompleto,
+        note: note,
+        KM: chilometraggio,
+        rimborso: rimoborsoInEuro
+    };
+    rimborsiChilometrici.push(rimborso);
+    aggiungiRigaTabellaRimborsiKm(rimborso);
+    aggiornaTotali();
+}
+
+function aggiungiRimborsoChilometrico() {
+    // Ottieni i valori dai campi di input
+    let idMissione = document.getElementById("idMissioneRK").value;
+    let dataMissione = document.getElementById("dataMissioneRK").value;
+	let partenzaId = document.getElementById("partenza").value; // Assumendo che "partenza" sia l'ID del campo di input
+	let arrivoId = document.getElementById("arrivo").value; // Assumendo che "arrivo" sia l'ID del campo di input
+    let note = document.getElementById("noteRK").value;
+	aggiungiRimborsoKM(idMissione, dataMissione, partenzaId, arrivoId, note);    
+}
+
+// Mantieni solo la funzione di aggiornamento delle etichette delle date
+function updateDataLabel(inputId, labelId) {
+    const inputData = document.getElementById(inputId);
+    const inputDate = inputData.value;
+    
+    // Aggiorna l'etichetta della data con il giorno della settimana
+    const labelElement = document.getElementById(labelId);
+    labelElement.textContent = getGiornoSettimanaItaliano(new Date(inputDate));
+}
+
+function updateDataInizioLabel() {
+    updateDataLabel("dataInizio", "giornoInizio");
+	updateCalculatedFields();
+}
+
+function updateDataFineLabel() {
+    updateDataLabel("dataFine", "giornoFine");
+	updateCalculatedFields();
+}
+
+
+// Funzione per aggiungere uno zero davanti a numeri inferiori a 10 (per il formato "dd/mm/yyyy")
+function aggiungiZero(numero) {
+    return numero < 10 ? `0${numero}` : numero;
+}
+
+	
+//============================== EVENTI ==========================================================
 document.addEventListener("DOMContentLoaded", function () {
     const formMissioni = document.getElementById("formMissioni");
     const tableBody = document.getElementById("trasferteTableBody");
@@ -462,7 +600,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	bottoneSalvaCSV.addEventListener("click", function () {
 		
 		 // Creazione di un oggetto Blob con il contenuto CSV
-		 const blob = new Blob([serializzaIntestazioneToCSV(), serializzaMissioniToCSV(missioni), serializzaTotaliToCSV(totali)], {
+		 const blob = new Blob([serializzaIntestazioneToCSV(), serializzaMissioniToCSV(missioni), serializzaRimborsiChilometriciCSV(rimborsiChilometrici), serializzaTotaliToCSV(totali)], {
 			// type: "text/csv;charset=utf-8",
 		 });
 		
@@ -576,8 +714,42 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-function serializzaIntestazioneToCSV(){}
+function serializzaIntestazioneToCSV(){
+
+}
+
+
 function serializzaTotaliToCSV(){}
+
+function serializzaRimborsiChilometriciCSV(){
+	const header = ["ID", "id Missione", "Data", "Giorno", "Partenza", "Destinazione", "Km", "Note","RImborso Chilometrico (€)"];
+    const rows = rimborsiChilometrici.map((rimborso) => [
+        rimborso.id,
+        rimborso.idMissione,
+		rimborso.dataMissione,
+		getGiornoSettimanaItaliano(new Date(rimborso.dataMissione)),
+		rimborso.partenza,
+		rimborso.arrivo,
+		rimborso.KM,
+		rimborso.note,
+		rimborso.rimborso,
+
+    ]);
+
+    rows.unshift(header); // Aggiungi l'intestazione come prima riga
+
+    let csvContent = "";
+    
+    // Genera il contenuto CSV
+    rows.forEach((row) => {
+        csvContent += row.map(quoteCSVValue).join(",") + "\n";
+    });
+
+    // Crea un blob con il contenuto CSV
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8" });
+
+    return blob;
+}
 
 function serializzaMissioniToCSV(missioni) {
     const header = ["ID", "Data Inizio", "Giorno Inizio", "Data Fine", "Giorno Fine", "Descrizione", "Numero Giorni", "Costo Trasferta (€)", "Trasferta Estera"];
@@ -734,7 +906,7 @@ function popolaNote() {
 function calcolaDistanza() {
     let partenza = document.getElementById("partenza").value;
     let arrivo = document.getElementById("arrivo").value;
-    let trattaSelezionata = distanze.find(d => (d.tratta.includes(parseInt(partenza)) && d.tratta.includes(parseInt(arrivo))));
+    let trattaSelezionata = configData.distanze.find(d => (d.tratta.includes(parseInt(partenza)) && d.tratta.includes(parseInt(arrivo))));
     if (trattaSelezionata) {
         document.getElementById("tempKM").value = trattaSelezionata.distanza;
     }
@@ -913,6 +1085,14 @@ function calcolaMissione(startDay, endDay){
 	aggiungiMissioneAllaTabella(id, dataInizio, giornoInizio, dataFine, giornoFine, descrizione, numeroGiorni, costo, trasfertaEstera);
 }
  
+ 
+function popolazioneAutomatica(){
+	popolaTabelleConMissioni();
+	popolaTabelleConRiborsiKM();
+	// Aggiorna i totali		
+	aggiornaMissioni();
+	aggiornaTotali();
+} 
 // Funzione per popolare le tabelle con missioni di default
 function popolaTabelleConMissioni() {
   // Ottieni il periodo selezionato
@@ -940,10 +1120,18 @@ function popolaTabelleConMissioni() {
       
     }
   }
-  // Aggiorna i totali		
-	aggiornaMissioni();
-	aggiornaTotali();
 }
+
+function formatYYYYMMDD(dateIn){
+	const anno = dateIn.getFullYear();
+  	const mese = dateIn.getMonth();
+  	const annoFormat = anno.toString();
+  	const meseFormat = (mese + 1).toString().padStart(2, '0');
+  	const giornoFormat = dateIn.getDate().toString().padStart(2, '0');
+	return `${annoFormat}-${meseFormat}-${giornoFormat}`;
+
+}
+
 
 function prossimoVenerdiOUltimoGiornoDelMese(dataInput) {
   // Clona la data di input per non modificarla direttamente
