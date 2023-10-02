@@ -8,7 +8,7 @@
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 	<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
-	<script src="js/script.js"></script>
+	<script src="js/gestoreTrasferte.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js"></script>
 	<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
 	<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
@@ -20,7 +20,7 @@
       });
   </script>	
 	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
-	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="css/gestoreTrasferte.css">
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/css/select2.min.css" rel="stylesheet" />
 
 </head>
@@ -44,7 +44,8 @@
         </div>
         <div>
             <label for="periodo">Periodo di riferimento (Mese/Anno):</label>
-            <input type="month" id="periodo"  oninput="updateCalculatedFields()">
+            <input type="month" id="periodo">
+            <button type="button" onClick="popolaTabelleConMissioni()">genera periodo</button>
         </div>
 		<h3>Valori Forfettari</h3>
         <div class="riga-intestazione">
@@ -230,7 +231,8 @@
                 <th>Indirizzo di Arrivo</th>
                 <th>Km</th>
                 <th>Note</th>
-                <th>Rimborso Chilometrico (€)</th>                
+                <th>Rimborso Chilometrico (€)</th>   
+                <th>EliminaRiga</th>               
             </tr>
         </thead>
         <tbody id="RKTableBody">

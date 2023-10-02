@@ -4,14 +4,14 @@ let rimborsiChilometrici = [];
 
 let totali = [];
 // Definisci una variabile JavaScript e assegna il tuo oggetto JSON ad essa
-  var configData = {
-    "descrizioneMissioni": [
-      { "codice": "001", "descrizione": "Missione A" },
-      { "codice": "002", "descrizione": "Missione B" },
-      // Altri elementi dell'array...
-    ],
-    // Altre proprietà dell'oggetto JSON...
-  };
+var configData = {
+"descrizioneMissioni": [
+  { "codice": "001", "descrizione": "Missione A" },
+  { "codice": "002", "descrizione": "Missione B" },
+  // Altri elementi dell'array...
+],
+// Altre proprietà dell'oggetto JSON...
+};
 // Variabile di sessione per gli indirizzi (esempio)
 let indirizzi = [
     { id: 1, nome: "Casa Sestino", dettagli: { via: "Via Marche 37", cap: "52038", citta: "Sestino (AR)" } },
@@ -202,15 +202,17 @@ function calcolaGiorniTrasferta(dataInizio, dataFine) {
 	return numeroGiorni;
 }
 
+
+
 // Calcolo dei giorni della trasferta
-function calcolaCostoTrasferta() {
-	const dataFine = document.getElementById("dataFine").value;
-	const dataInizio = document.getElementById("dataInizio").value;
+function calcolaCostoTrasfertaParam(giornoIn, giornoFin, trasfertaEstera) {
+	const dataFine = giornoFin;
+	const dataInizio = giornoIn;
 	const giorni = calcolaGiorniTrasferta(new Date(dataInizio), new Date(dataFine));
 	let costoGiornaliero = parseFloat(document.getElementById("forfettarioNazionale").value);
 
 	// Verifica se la trasferta è estera e imposta il costo giornaliero
-	if (document.getElementById("trasfertaEstera").checked) {
+	if (trasfertaEstera) {
 		costoGiornaliero = parseFloat(document.getElementById("forfettarioEstero").value);
 	}
 
@@ -363,6 +365,58 @@ function aggiungiZero(numero) {
     return numero < 10 ? `0${numero}` : numero;
 }
 
+	// Funzione per aggiungere una nuova riga alla tabella delle trasferte
+	function aggiungiMissioneAllaTabella(id, dataInizio, giornoInizio, dataFine, giornoFine, descrizione, numeroGiorni, costo, trasfertaEstera) {
+		// Seleziona la tabella e il corpo della tabella
+		const table = document.getElementById("trasferteTable");
+		const tableBody = document.getElementById("trasferteTableBody");
+
+		// Crea una nuova riga (elemento <tr>)
+		const newRow = document.createElement("tr");
+		newRow.setAttribute("data-id", id);
+
+		// Aggiungi le celle (elementi <td>) alla riga
+		newRow.innerHTML = `
+			<td>${id}</td>
+			<td><input oninput="updateMissionRow(${id})" class="editable" data-id="${id}" data-field="dataInizio" type="date" value="${dataInizio}"></td>
+			<td data-field="giornoInizio">${giornoInizio}</td>
+			<td><input oninput="updateMissionRow(${id})" class="editable" data-id="${id}" data-field="dataFine" type="date" value="${dataFine}"></td>
+			<td data-field="giornoFine">${giornoFine}</td>
+			<td><select id="descMissioni${id}" oninput="updateMissionRow(${id})" class="editable-dropdown" data-id="${id}" data-field="descrizione" type="text" value="${descrizione}"></td>
+			<td data-field="numeroGiorni">${numeroGiorni}</td>
+			<td><input readonly class="editable" data-id="${id}" data-field="costo" type="number" step="0.01" value="${costo}"></td>
+			<td><input oninput="updateMissionRow(${id})" class="editable" data-id="${id}" data-field="trasfertaEstera" type="checkbox" ${trasfertaEstera ? "checked" : ""}></td>
+		`;
+		
+		
+
+		// Aggiungi la riga al corpo della tabella
+		tableBody.appendChild(newRow);
+
+		// Aggiungi eventi di input alle celle editabili per gestire le modifiche
+		const editableCells = newRow.querySelectorAll(".editable");
+		editableCells.forEach((cell) => {
+			cell.addEventListener("input", function () {
+				const missionId = cell.getAttribute("data-id");
+				const field = cell.getAttribute("data-field");
+				const newValue = cell.value;
+
+				// Aggiorna l'oggetto Missions con i nuovi valori
+				aggiornaMissione(id, field, newValue);
+				
+			});
+		});
+		setDescrizioneMissioniDropDown("descMissioni"+id);
+		aggiornaTotali();
+	}
+
+	// Funzione per aggiornare un campo specifico di una missione nell'oggetto Missions
+	function aggiornaMissione(id, field, newValue) {
+		const missione = missioni.find((missione) => missione.id === id);
+		if (missione) {
+			missione[field] = newValue;
+		}
+	}
 
 document.addEventListener("DOMContentLoaded", function () {
     const formMissioni = document.getElementById("formMissioni");
@@ -371,7 +425,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const totaleGiorniTrasferta = document.getElementById("totaleGiorniTrasferta");
     const totaleGiorniEstera = document.getElementById("totaleGiorniEstera");
     const totaleGiorniNazionale = document.getElementById("totaleGiorniNazionale");
-    const meseAnnoInput = document.getElementById("periodo");
+
 	
 	const dataInizioInput = document.getElementById("dataInizio");
 	dataInizioInput.addEventListener("input", updateDataInizioLabel);
@@ -466,7 +520,13 @@ document.addEventListener("DOMContentLoaded", function () {
 			fileReader.readAsText(selectedFile);
 		}
 	});
-
+	
+	// Calcolo dei giorni della trasferta
+	function calcolaCostoTrasferta() {	 
+		const giornoFIn = document.getElementById("dataFine").value;
+		const giornoIN = document.getElementById("dataInizio").value;
+		return calcolaCostoTrasfertaParam(giornoIN, giornoFIn, document.getElementById("trasfertaEstera").checked);
+	}
 	
 	function generateUniqueId(col, rowId) {
 		return col + "_" + rowId;
@@ -506,58 +566,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		formMissioni.reset();
 	});
 	
-	// Funzione per aggiungere una nuova riga alla tabella delle trasferte
-	function aggiungiMissioneAllaTabella(id, dataInizio, giornoInizio, dataFine, giornoFine, descrizione, numeroGiorni, costo, trasfertaEstera) {
-		// Seleziona la tabella e il corpo della tabella
-		const table = document.getElementById("trasferteTable");
-		const tableBody = document.getElementById("trasferteTableBody");
 
-		// Crea una nuova riga (elemento <tr>)
-		const newRow = document.createElement("tr");
-		newRow.setAttribute("data-id", id);
-
-		// Aggiungi le celle (elementi <td>) alla riga
-		newRow.innerHTML = `
-			<td>${id}</td>
-			<td><input oninput="updateMissionRow(${id})" class="editable" data-id="${id}" data-field="dataInizio" type="date" value="${dataInizio}"></td>
-			<td data-field="giornoInizio">${giornoInizio}</td>
-			<td><input oninput="updateMissionRow(${id})" class="editable" data-id="${id}" data-field="dataFine" type="date" value="${dataFine}"></td>
-			<td data-field="giornoFine">${giornoFine}</td>
-			<td><select id="descMissioni${id}" oninput="updateMissionRow(${id})" class="editable-dropdown" data-id="${id}" data-field="descrizione" type="text" value="${descrizione}"></td>
-			<td data-field="numeroGiorni">${numeroGiorni}</td>
-			<td><input readonly class="editable" data-id="${id}" data-field="costo" type="number" step="0.01" value="${costo}"></td>
-			<td><input oninput="updateMissionRow(${id})" class="editable" data-id="${id}" data-field="trasfertaEstera" type="checkbox" ${trasfertaEstera ? "checked" : ""}></td>
-		`;
-		
-		
-
-		// Aggiungi la riga al corpo della tabella
-		tableBody.appendChild(newRow);
-
-		// Aggiungi eventi di input alle celle editabili per gestire le modifiche
-		const editableCells = newRow.querySelectorAll(".editable");
-		editableCells.forEach((cell) => {
-			cell.addEventListener("input", function () {
-				const missionId = cell.getAttribute("data-id");
-				const field = cell.getAttribute("data-field");
-				const newValue = cell.value;
-
-				// Aggiorna l'oggetto Missions con i nuovi valori
-				aggiornaMissione(id, field, newValue);
-				
-			});
-		});
-		setDescrizioneMissioniDropDown("descMissioni"+id);
-		aggiornaTotali();
-	}
-
-	// Funzione per aggiornare un campo specifico di una missione nell'oggetto Missions
-	function aggiornaMissione(id, field, newValue) {
-		const missione = missioni.find((missione) => missione.id === id);
-		if (missione) {
-			missione[field] = newValue;
-		}
-	}
 	
 	// Chiamate iniziali
 	popolaIndirizzi("partenza");
@@ -801,6 +810,8 @@ function aggiungiRimborsoChilometrico() {
 	
     
     const row = document.createElement("tr");
+    const idRow = getTrasferteKMId();
+    row.id= "rimborsoKmRiga"+idRow;
     row.insertCell(0).innerHTML = idMissione;
     row.insertCell(1).innerHTML = dataMissione;
     row.insertCell(2).innerHTML = getGiornoSettimanaItaliano(new Date(dataMissione));
@@ -809,6 +820,7 @@ function aggiungiRimborsoChilometrico() {
     row.insertCell(5).innerHTML = tempKM;
     row.insertCell(6).innerHTML = note;
     row.insertCell(7).innerHTML = rimborsoKMtmp;
+    row.insertCell(8).innerHTML = `<td><button class="delete-row" onClick="deleteRow(${idRow})">X</button></td>`;
 
 		
 		
@@ -818,6 +830,7 @@ function aggiungiRimborsoChilometrico() {
 
     // Aggiungi i valori alla variabile di sessione
     let rimborso = {
+    	id: idRow,
         idMissione: idMissione,
         dataMissione: dataMissione,
         partenza: partenzaIndirizzoCompleto,
@@ -830,5 +843,131 @@ function aggiungiRimborsoChilometrico() {
     aggiornaTotali();
 }
 
+// genera il prossimo id della lista dei rimborsi chilometrici
+function getTrasferteKMId(){
+	// Inizializza una variabile per tenere traccia dell'id massimo
+	let idMassimo = -1; // Inizializzalo a un valore basso
 
-  
+	// Itera attraverso gli oggetti nell'array
+	for (const oggetto of rimborsiChilometrici) {
+	  // Converte l'id in un numero (potrebbe essere una stringa)
+	  const idNumero = parseInt(oggetto.id, 10);
+
+	  // Verifica se l'id è maggiore dell'attuale id massimo
+	  if (!isNaN(idNumero) && idNumero > idMassimo) {
+		idMassimo = idNumero;
+	  }
+	}
+
+	return idMassimo;
+	
+
+}
+
+function deleteRow(id){
+
+	// Suppose you have the ID of the row you want to delete
+	const rowIdToDelete = "rimborsoKmRiga"+id; // Replace with the actual ID you want to delete
+
+	// Get the row element by its ID
+	const rowToDelete = document.getElementById(rowIdToDelete);
+
+	// Check if the row element exists before attempting to delete it
+	if (rowToDelete) {
+	  // Use the parentElement property to access the <tbody> or <table> element
+	  const parentElement = rowToDelete.parentElement;
+
+	  // Remove the row from the DOM
+	  parentElement.removeChild(rowToDelete);
+	} else {
+	  console.log("Row not found with ID: " + rowIdToDelete);
+	}
+	
+	
+	eliminaOggettoPerID(rimborsiChilometrici, id);
+	aggiornaTotali();
+}
+
+function eliminaOggettoPerID(array, idDaEliminare) {
+  // Cerca l'indice dell'oggetto con l'ID specificato nell'array
+  const indiceDaEliminare = array.findIndex(oggetto => oggetto.id === idDaEliminare);
+
+  // Verifica se l'indice è valido (-1 indica che l'elemento non è stato trovato)
+  if (indiceDaEliminare !== -1) {
+    // Utilizza splice per rimuovere l'oggetto dall'array
+    array.splice(indiceDaEliminare, 1);
+  }
+}
+
+function calcolaMissione(startDay, endDay){
+	const id = calcolaNuovoId(); 
+	const dataInizio = startDay; 
+	const giornoInizio = getGiornoSettimanaItaliano(new Date(dataInizio)); // Inizializza giornoInizio come una stringa vuota
+	const dataFine = endDay; // Inizializza dataFine come un oggetto Data con la data corrente
+	const giornoFine = getGiornoSettimanaItaliano(new Date(dataFine)); // Inizializza giornoFine come una stringa vuota
+	const descrizione = configData[0]; // Inizializza descrizione come una stringa vuota
+	const numeroGiorni = calcolaGiorniTrasferta(new Date(dataInizio),new Date(dataFine)); // Inizializza numeroGiorni come 0 (zero)		
+	const trasfertaEstera = false; // Inizializza trasfertaEstera come false (booleano falso)
+	let costo = calcolaCostoTrasfertaParam(dataInizio, giornoFine, trasfertaEstera);
+	aggiungiMissione(id, dataInizio, giornoInizio, dataFine, giornoFine, descrizione, numeroGiorni, costo, trasfertaEstera);
+	aggiungiMissioneAllaTabella(id, dataInizio, giornoInizio, dataFine, giornoFine, descrizione, numeroGiorni, costo, trasfertaEstera);
+}
+ 
+// Funzione per popolare le tabelle con missioni di default
+function popolaTabelleConMissioni() {
+  // Ottieni il periodo selezionato
+  const periodoInput = document.getElementById('periodo');
+  const periodoValue = periodoInput.value; // Assume che il valore sia nel formato "yyyy-mm"
+
+  // Divide il periodo in anno e mese
+  const [anno, mese] = periodoValue.split('-');
+
+  // Ottieni il numero di giorni nel mese
+  const giorniNelMese = new Date(anno, mese, 0).getDate();
+
+  // Inizia a popolare le tabelle
+  for (let giorno = 1; giorno <= giorniNelMese; giorno++) {
+    const data = new Date(anno, mese - 1, giorno);
+    const giornoSettimana = data.getDay(); // 0 = Domenica, 1 = Lunedì, ..., 6 = Sabato
+
+    // Se il giorno è un lunedì (1) o un venerdì (5), aggiungi una missione
+    if (giornoSettimana === 1) {
+      // Crea la stringa nel formato "yyyy-mm-dd"
+      const giornoFormat = data.getDate().toString().padStart(2, '0');
+	const dataIn = `${anno}-${mese}-${giornoFormat}`;
+      
+	  calcolaMissione(dataIn, prossimoVenerdiOUltimoGiornoDelMese(dataIn));
+      
+    }
+  }
+  // Aggiorna i totali		
+	aggiornaMissioni();
+	aggiornaTotali();
+}
+
+function prossimoVenerdiOUltimoGiornoDelMese(dataInput) {
+  // Clona la data di input per non modificarla direttamente
+  const data = new Date(dataInput);
+
+  // Trova il giorno corrente della settimana (0 = Domenica, 1 = Lunedì, ..., 6 = Sabato)
+  const giornoSettimana = data.getDay();
+
+  // Calcola il numero di giorni rimanenti nel mese
+  const anno = data.getFullYear();
+  const mese = data.getMonth();
+  const giorniNelMese = new Date(anno, mese + 1, 0).getDate();
+  const giorniRimanenti = giorniNelMese - data.getDate();
+
+  // Calcola il numero di giorni necessari per raggiungere il prossimo venerdì
+  const giorniDaVenerdi = (5 - giornoSettimana + 7) % 7;
+  data.setDate(data.getDate() + giorniDaVenerdi);
+ 
+  // Formatta la data nel formato "yyyy-mm-dd"
+  const annoFormat = anno.toString();
+  const meseFormat = (mese + 1).toString().padStart(2, '0');
+  const giornoFormat = data.getDate().toString().padStart(2, '0');
+
+  return `${annoFormat}-${meseFormat}-${giornoFormat}`;
+}
+
+
